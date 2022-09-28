@@ -8,18 +8,24 @@ import { deleteAsync } from "expo-file-system";
 export default function ImagesScreen() {
   const [imagesURI, setImagesURI] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
+
+  const fetchData = () => {
+    (async () => {
+        const images = await FileSystem.readDirectoryAsync(
+          FileSystem.cacheDirectory + "ImageManipulator"
+        );
+        setImagesURI(images);
+      })();
+  }
   useEffect(() => {
-    async () => {
-      const images = await FileSystem.readDirectoryAsync(
-        FileSystem.cacheDirectory + "ImageManipulator"
-      );
-      setImagesURI(images);
-    };
-    setIsFetching(false);
+   fetchData(); 
   }, []);
-// Try refresh on the FlatList, on going...
+  
   const onRefresh = () => {
     setIsFetching(true);
+    fetchData(); 
+    setTimeout(() => { setIsFetching(false), 2000})
+
     console.log("refreshed");
   };
 

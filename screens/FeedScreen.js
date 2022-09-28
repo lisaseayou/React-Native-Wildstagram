@@ -4,19 +4,34 @@ import { Text, StyleSheet, FlatList, Image} from "react-native";
 
 export default function FeedScreen() {
   const [serverImagesUrls, setServerImagesUrls] = useState([]);
-  useEffect(() => {
+  const [isFetching, setIsFetching] = useState(false);
+
+ const fetchData = () => {
     (async () => {
-      const filesUrl = await axios.get(
-        "https://wildstagram.nausicaa.wilders.dev/list"
-      );
-      console.log("filesurls", filesUrl.data);
-      setServerImagesUrls(filesUrl.data);
-    })();
+        const filesUrl = await axios.get(
+          "https://wildstagram.nausicaa.wilders.dev/list"
+        );
+        console.log("filesurls", filesUrl.data);
+        setServerImagesUrls(filesUrl.data);
+      })();
+ }
+  useEffect(() => {
+   fetchData();
   }, []);
+
+  const onRefresh = () => {
+    setIsFetching(true);
+    fetchData(); 
+    setTimeout(() => { setIsFetching(false), 2000})
+
+    console.log("refreshed");
+  };
   return serverImagesUrls.length > 0 ? (
     <FlatList
       data={serverImagesUrls}
       keyExtractor={(serverImageURI) => serverImageURI}
+      onRefresh={onRefresh}
+      refreshing={isFetching}
       renderItem={(itemData) => {
         console.log("item", itemData);
         return (
